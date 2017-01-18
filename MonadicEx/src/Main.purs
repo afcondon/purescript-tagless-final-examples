@@ -8,12 +8,8 @@ import Prelude (Unit, bind, map, ($))
 
 joinFiles :: ∀ m. (MonadFileSystem m) => m String
 joinFiles = do
-    cd "."
-    files1 <- ls
-    cd ".."
-    files2 <- ls
-    cd "doesnt/exist"
-    cat $ map fst files1
+    files <- ls
+    cat $ map fst files
 
 justLS :: forall m. (MonadFileSystem m) => m (Array (Tuple String FileType))
 justLS = do
