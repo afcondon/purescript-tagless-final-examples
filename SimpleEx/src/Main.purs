@@ -28,22 +28,22 @@ list_viewed = map view listOfExpr   -- ["1","(1 + 3)","(8 + (-(1 + 2)))"]
 -- An extended sample expression
 extendedExpression = add (lit 7) (neg (mul (lit 1) (lit 2)))
 
--- We can even use a previously defined unextended expression (tf1)
+extExpression_evaluated = eval extendedExpression   -- 5
+extExpression_viewed = view extendedExpression      -- "(7 + (-(1 * 2)))"
+
+-- We can even use a previously defined unextended expression (sampleExpression)
 -- as a part of the extended expression.
 -- We can indeed mix-and-match
 mixedExpression = mul (lit 7) sampleExpression
 
-extExpression_evaluated = eval extendedExpression   -- 5
-mixExpression_evaluated = eval mixedExpression   -- 35
-
-extExpression_viewed = view extendedExpression    -- "(7 + (-(1 * 2)))"
-mixExpression_viewed = view mixedExpression    -- "(7 * (8 + (-(1 + 2))))"
+mixExpression_evaluated = eval mixedExpression      -- 35
+mixExpression_viewed = view mixedExpression         -- "(7 * (8 + (-(1 + 2))))"
 
 -- We can put the original, unextended expressions
 -- and the extended ones (which we have just defined)
 -- into the same list
 mixedExprList = extendedExpression : mixedExpression : [sampleExpression]   -- add extended expressions
-
+-- and eval or view using map just as before
 mixedExprList_eval = map eval mixedExprList   -- [5,35,5]
 mixedExprList_view = map view mixedExprList   -- ["(7 + (-(1 * 2)))","(7 * (8 + (-(1 + 2))))","(8 + (-(1 + 2)))"]
 
