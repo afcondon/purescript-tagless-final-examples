@@ -1,6 +1,6 @@
 # purescript-finally-tagless-ex
 
-Direct port of examples the finally tagless, partially evaluated pattern to Purescript.
+Direct port to Purescript (from Haskell) of two examples of the finally tagless, partially evaluated pattern.
 
 There are two examples here:
 
