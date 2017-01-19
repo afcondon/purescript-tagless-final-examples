@@ -4,7 +4,8 @@ import AbstractFileSystem (class MonadFileSystem, FileType, cat, cd, ls)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import Data.Tuple (Tuple, fst)
-import Prelude (Unit, bind, map, ($))
+import FakeFileSystem (FakeFS)
+import Prelude (Unit, bind, map, pure, ($))
 
 joinFiles :: ∀ m. (MonadFileSystem m) => m String
 joinFiles = do
@@ -24,6 +25,7 @@ justCAT = do
   cat [".", "some/other/path"]
 
 
-main :: forall eff. Eff ( console :: CONSOLE | eff ) Unit
+main :: forall eff. FakeFS (Eff ( console :: CONSOLE | eff ) Unit )
 main = do
-    log "hello sailor"
+    x <- (joinFiles :: FakeFS String)
+    pure $ log x
