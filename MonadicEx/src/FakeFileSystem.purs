@@ -1,12 +1,13 @@
 module FakeFileSystem where
 
-import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, ap, pure, unit, ($), (<<<), (<>))
+import AbstractFileSystem (class MonadFileSystem, FilePath, FileType(..))
 import Data.Array (foldl, mapMaybe, uncons, (:))
 import Data.Maybe (Maybe(..))
 import Data.Profunctor.Strong (first)
 import Data.String (joinWith)
 import Data.Tuple (Tuple(..), fst, snd, lookup)
-import AbstractFileSystem (class MonadFileSystem, FilePath, FileType(..))
+import Data.Unit (Unit)
+import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, ap, pure, unit, ($), (<<<), (<>))
 
 data FS = FS { files :: Array (Tuple FilePath String), directories :: Array (Tuple FilePath FS) }
 
@@ -52,21 +53,30 @@ instance monadFakeFS :: Monad FakeFS
 
 instance monadfilesystemFakeFS :: MonadFileSystem FakeFS where
   cd "."  = pure unit
+  cd ".." = FakeFS $ cdDotDot
+  cd dir  = FakeFS $ cdDir dir
+  ls      = FakeFS $ ls'
+  cat fs  = FakeFS $ cat' fs
 
-  cd ".." = FakeFS $ \(Zipper dir ctx) ->
+-- implementations of each of the FakeFS "methods"
+cdDotDot :: Zipper -> Tuple Unit Zipper
+cdDotDot (Zipper dir ctx) =
     case uncons ctx of
-      (Just { head, tail }) -> Tuple unit (Zipper head tail)
-      Nothing -> Tuple unit (Zipper dir ctx)
+        (Just { head, tail }) -> Tuple unit (Zipper head tail)
+        Nothing               -> Tuple unit (Zipper dir ctx)
 
-  cd dir = FakeFS $ \(Zipper cur ups) ->
+cdDir :: FilePath -> Zipper -> Tuple Unit Zipper
+cdDir dir (Zipper cur ups) =
     case lookup dir (getDirectories cur) of
-      Just fs' -> Tuple unit (Zipper fs' (cur : ups))
-      _ -> Tuple unit (Zipper cur ups)
+        Just fs' -> Tuple unit (Zipper fs' (cur : ups))
+        _        -> Tuple unit (Zipper cur ups)
 
-  ls = FakeFS $ \(Zipper cur ctx) ->
+ls' :: Zipper -> Tuple (Array (Tuple FilePath FileType)) Zipper
+ls' (Zipper cur ctx) =
     let fs = listing File $ getFiles cur
         ds = listing Directory $ getDirectories cur
     in Tuple (fs <> ds) (Zipper cur ctx)
 
-  cat fs = FakeFS $ \(Zipper cur ctx) ->
-    Tuple (joinWith "\n" $ mapMaybe (\f -> lookup f (getFiles cur)) fs) (Zipper cur ctx)
+cat' :: Array String -> Zipper -> Tuple String Zipper
+cat' fs (Zipper cur ctx) =
+  Tuple (joinWith "\n" $ mapMaybe (\f -> lookup f (getFiles cur)) fs) (Zipper cur ctx)
