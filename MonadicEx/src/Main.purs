@@ -1,29 +1,32 @@
 module Main where
 
-import AbstractFileSystem (class MonadFileSystem, cat, ls)
+import AbstractFileSystem (class MonadFileSystem, cat, cd, ls)
 import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE, log)
+import Control.Monad.Eff.Console (CONSOLE, log, logShow)
 import Data.Tuple (Tuple(..), fst)
-import FakeFileSystem (FS(FS), Zipper(Zipper), fake)
+import FakeFileSystem (FS(FS), Zipper(Zipper), run)
 import Prelude (Unit, bind, map, ($))
 
 joinFiles :: ∀ m. (MonadFileSystem m) => m String
 joinFiles = do
+    dir1  <- cd "dir1"
     files <- ls
-    cat $ map fst files
+    cat    $ map fst files
 
 -- dummy file system provides the Zipper that we use against the joinFiles "script"
-emptyFS :: FS
-emptyFS = FS { files: [], directories: [] }
-
 myFS :: FS
 myFS = FS { files: [ (Tuple "awn" "awn contents")
                    , (Tuple "bel" "bel contents")
                    , (Tuple "cep" "cep contents")
                    ]
-          , directories: [ (Tuple "dir1" emptyFS)
-                         , (Tuple "dir2" emptyFS)
-                         , (Tuple "dir3" emptyFS)
+          , directories: [ (Tuple "dir1" (FS { files: [ (Tuple "dof" "dof contents")
+                                                      , (Tuple "erg" "erg contents")
+                                                      , (Tuple "fid" "fid contents")
+                                                      ]
+                                             , directories: []
+                                             }))
+                         , (Tuple "dir2" (FS { files: [], directories: [] }) )
+                         , (Tuple "dir3" (FS { files: [], directories: [] }) )
                          ]
           }
 
@@ -34,5 +37,5 @@ myZipper = Zipper myFS []
 
 main :: forall eff. Eff ( console :: CONSOLE | eff ) Unit
 main = do
-  let x = fake joinFiles myZipper
-  log x
+    logShow myZipper
+    log $ run joinFiles myZipper

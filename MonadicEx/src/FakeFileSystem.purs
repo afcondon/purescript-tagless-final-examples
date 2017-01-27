@@ -7,7 +7,7 @@ import Data.Profunctor.Strong (first)
 import Data.String (joinWith)
 import Data.Tuple (Tuple(..), fst, snd, lookup)
 import Data.Unit (Unit)
-import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, ap, pure, unit, ($), (<<<), (<>))
+import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Show, ap, pure, show, unit, ($), (<<<), (<>))
 
 data FS = FS { files :: Array (Tuple FilePath String), directories :: Array (Tuple FilePath FS) }
 
@@ -21,15 +21,18 @@ getDirectories (FS { directories }) = directories
 listing :: ∀ a. FileType -> Array (Tuple FilePath a) -> Array (Tuple FilePath FileType)
 listing ft = foldl (\fs tup -> (Tuple (fst tup) ft):fs) []
 
--- instance showFS :: Show FS where
---   show fs = show $ ((listing File) <$> getFiles fs) <> ((listing Directory) <$> getDirectories fs)
+instance showFS :: Show FS where
+  show fs = show $ ((listing File) $ getFiles fs) <> ((listing Directory) $ getDirectories fs)
 
 data Zipper = Zipper FS (Array FS)
 
+instance showZipper :: Show Zipper where
+  show (Zipper fs fss) = show fs <> show fss
+
 data FakeFS a = FakeFS (Zipper -> (Tuple a Zipper))
 
-fake :: ∀ a. FakeFS a -> Zipper -> a
-fake (FakeFS f) = fst <<< f
+run :: ∀ a. FakeFS a -> Zipper -> a
+run (FakeFS f) = fst <<< f
 
 instance functorFakeFS :: Functor FakeFS where
     map f (FakeFS g) = FakeFS $ first f <<< g
@@ -42,9 +45,8 @@ instance applicativeFakeFS :: Applicative FakeFS where
 
 instance bindFakeFS :: Bind FakeFS where
   bind (FakeFS f) k = FakeFS $ \z0 ->
-    let  az1 = f z0 -- = (Tuple a z1)
-         f1 = zipperFn $ k (fst az1)
-    in f1 (snd az1)
+    let az1 = f z0   -- f z0 = (Tuple a z1)
+    in (zipperFn $ k $ fst az1) (snd az1)
 
 zipperFn :: ∀ a. FakeFS a -> (Zipper -> Tuple a Zipper)
 zipperFn (FakeFS f) = f
@@ -79,4 +81,4 @@ ls' (Zipper cur ctx) =
 
 cat' :: Array String -> Zipper -> Tuple String Zipper
 cat' fs (Zipper cur ctx) =
-  Tuple (joinWith "\n" $ mapMaybe (\f -> lookup f (getFiles cur)) fs) (Zipper cur ctx)
+    Tuple (joinWith "\n" $ mapMaybe (\f -> lookup f (getFiles cur)) fs) (Zipper cur ctx)
