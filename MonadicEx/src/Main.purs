@@ -7,7 +7,7 @@ import Control.Monad.Eff.Exception (EXCEPTION)
 import Data.Tuple (Tuple(..), fst)
 import FakeFileSystem (FS(FS), Zipper(Zipper), run)
 import Node.FS (FS) as N
-import NodeFileSystem (main2)
+import NodeFileSystem (Cursor(..), main2, runFS)
 import Prelude (Unit, bind, map, ($))
 
 joinFiles :: ∀ m. (MonadFileSystem m) => m String
@@ -36,10 +36,13 @@ myFS = FS { files: [ (Tuple "awn" "awn contents")
 myZipper :: Zipper
 myZipper = Zipper myFS []
 
+myCursor :: Cursor
+myCursor = Cursor "empty"
+
 -- use the "fake" function to unwrap the FakeFS monad and get at the result so that we can log it
 
 main :: forall eff. Eff ( err :: EXCEPTION, fs :: N.FS, console :: CONSOLE | eff ) Unit
 main = do
-    main2
+    log $ runFS joinFiles myCursor
     logShow myZipper
     log $ run joinFiles myZipper
