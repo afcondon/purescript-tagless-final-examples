@@ -3,8 +3,11 @@ module Main where
 import AbstractFileSystem (class MonadFileSystem, cat, cd, ls)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log, logShow)
+import Control.Monad.Eff.Exception (EXCEPTION)
 import Data.Tuple (Tuple(..), fst)
 import FakeFileSystem (FS(FS), Zipper(Zipper), run)
+import Node.FS (FS) as N
+import NodeFileSystem (main2)
 import Prelude (Unit, bind, map, ($))
 
 joinFiles :: ∀ m. (MonadFileSystem m) => m String
@@ -35,7 +38,8 @@ myZipper = Zipper myFS []
 
 -- use the "fake" function to unwrap the FakeFS monad and get at the result so that we can log it
 
-main :: forall eff. Eff ( console :: CONSOLE | eff ) Unit
+main :: forall eff. Eff ( err :: EXCEPTION, fs :: N.FS, console :: CONSOLE | eff ) Unit
 main = do
+    main2
     logShow myZipper
     log $ run joinFiles myZipper
