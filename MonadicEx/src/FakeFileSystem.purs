@@ -29,7 +29,7 @@ data Zipper = Zipper FS (Array FS)
 instance showZipper :: Show Zipper where
   show (Zipper fs fss) = show fs <> show fss
 
-data FakeFS a = FakeFS (Zipper -> (Tuple a Zipper))
+data FakeFS a = FakeFS (Zipper -> Tuple a Zipper)
 
 run :: ∀ a. FakeFS a -> Zipper -> a
 run (FakeFS f) = fst <<< f
