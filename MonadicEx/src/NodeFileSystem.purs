@@ -29,8 +29,5 @@ instance monadFileSystemFSEff :: MonadFileSystem (FSEff eff) where
   cd "."  = pure unit
   cd ".." = pure unit
   cd _    = pure unit
-  ls =
-    do
-        let fs = readdir "."
-        pure (unsafePerformEff fs)
+  ls = pure $ unsafePerformEff $ readdir "."
   cat fs = pure $ show fs
