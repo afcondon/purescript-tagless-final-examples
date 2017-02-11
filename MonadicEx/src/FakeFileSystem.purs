@@ -7,7 +7,7 @@ import Data.Profunctor.Strong (first)
 import Data.String (joinWith)
 import Data.Tuple (Tuple(..), fst, snd, lookup)
 import Data.Unit (Unit)
-import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Show, ap, pure, show, unit, ($), (<<<), (<>))
+import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Show, ap, pure, show, unit, ($), (<<<), (<>), (<$>))
 
 data FS = FS { files :: Array (Tuple FilePath String), directories :: Array (Tuple FilePath FS) }
 
@@ -57,7 +57,7 @@ instance monadfilesystemFakeFS :: MonadFileSystem FakeFS where
   cd "."  = pure unit
   cd ".." = FakeFS $ cdDotDot
   cd dir  = FakeFS $ cdDir dir
-  ls      = FakeFS $ ls'
+  ls      = FakeFS $ ls''
   cat fs  = FakeFS $ cat' fs
 
 -- implementations of each of the FakeFS "methods"
@@ -78,6 +78,11 @@ ls' (Zipper cur ctx) =
     let fs = listing File $ getFiles cur
         ds = listing Directory $ getDirectories cur
     in Tuple (fs <> ds) (Zipper cur ctx)
+
+ls'' :: Zipper -> Tuple (Array FilePath) Zipper
+ls'' z@(Zipper cur ctx) = Tuple (files <> dirs) z
+    where files = fst <$> getFiles cur
+          dirs  = fst <$> getDirectories cur
 
 cat' :: Array String -> Zipper -> Tuple String Zipper
 cat' fs (Zipper cur ctx) =
