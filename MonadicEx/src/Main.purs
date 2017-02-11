@@ -13,7 +13,7 @@ import Prelude (Unit, bind, map, ($), (<>))
 
 joinFiles :: ∀ m. (MonadFileSystem m) => m String
 joinFiles = do
-    dir1  <- cd "dir1"
+    dir1  <- cd "test/dir1"
     files <- ls
     cat files
 
