@@ -26,3 +26,26 @@ instance monadFileSystemFSEff :: MonadFileSystem (FSEff eff) where
   cd _    = pure unit
   ls = pure $ unsafePerformEff $ readdir "."
   cat fs = pure $ show fs
+
+
+-- | below is another way of getting the MonadFileSystem instance for the Eff,
+-- but this necessarily requires that the extension classes be defined in the
+-- same file as the abstract class, thus defeating the idea of extensibility.
+-- Example by @garyb
+
+{-
+instance monadFileSystemEff :: EffectRowEquals r (fs :: FS, err :: EXCEPTION | eff) => MonadFileSystem (Eff r) where
+  cd _ = pure unit
+  ls = pure []
+  cat _ = pure "meow"
+
+-- This should probably go in `purescript-type-equality`:
+
+class EffectRowEquals (a ∷ # !) (b ∷ # !) | a → b, b → a where
+  toER ∷ ∀ r. r a → r b
+  fromER ∷ ∀ r. r b → r a
+
+instance reflER ∷ EffectRowEquals r r where
+  toER er = er
+  fromER er = er
+-}
