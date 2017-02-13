@@ -1,19 +1,14 @@
 module Main where
 
 import AbstractFileSystem (class MonadFileSystem, FilePath, cat, cd, ls)
-import Control.Alternative (liftA1)
 import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Class (liftEff)
-import Control.Monad.Eff.Console (CONSOLE, log, logShow)
+import Control.Monad.Eff.Console (CONSOLE, log)
 import Control.Monad.Eff.Exception (EXCEPTION)
-import Control.Monad.Eff.Unsafe (unsafePerformEff)
-import Control.Monad.State.Trans (runStateT)
-import Data.Tuple (Tuple(..), fst, snd)
 import DummyData (sampleFakeFS)
-import FakeFileSystem (FS(FS), Zipper(Zipper), run)
+import FakeFileSystem (run)
 import Node.FS (FS) as N
-import NodeFileSystem (FSEff(..), fsRun, fsState)
-import Prelude (Unit, bind, map, pure, show, ($), (<>))
+import NodeFileSystem (fsRun, fsState)
+import Prelude (Unit, bind, show, ($), (<>))
 
 joinFiles :: ∀ m. (MonadFileSystem m) => m String
 joinFiles = do
