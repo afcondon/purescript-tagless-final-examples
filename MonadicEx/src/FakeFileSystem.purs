@@ -7,7 +7,7 @@ import Data.Profunctor.Strong (first)
 import Data.String (joinWith)
 import Data.Tuple (Tuple(..), fst, snd, lookup)
 import Data.Unit (Unit)
-import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Show, ap, pure, show, unit, ($), (<<<), (<>), (<$>))
+import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Show, ap, pure, show, unit, ($), (<$>), (<<<), (<>))
 
 data FS = FS { files :: Array (Tuple FilePath String), directories :: Array (Tuple FilePath FS) }
 
@@ -80,9 +80,9 @@ ls' (Zipper cur ctx) =
     in Tuple (fs <> ds) (Zipper cur ctx)
 
 ls'' :: Zipper -> Tuple (Array FilePath) Zipper
-ls'' z@(Zipper cur ctx) = Tuple (files <> dirs) z
+ls'' (Zipper cur ctx) = Tuple (files <> dirs) (Zipper cur ctx)
     where files = fst <$> getFiles cur
-          dirs  = fst <$> getDirectories cur
+          dirs  = fst <$>getDirectories cur
 
 cat' :: Array String -> Zipper -> Tuple String Zipper
 cat' fs (Zipper cur ctx) =
