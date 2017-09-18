@@ -1,5 +1,5 @@
 {
-  "name": "SimpleEx",
+  "name": "MonadicEx",
   "ignore": [
     "**/.*",
     "node_modules",
