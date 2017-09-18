@@ -1,10 +1,6 @@
 module AbstractFileSystem where
 
-import Prelude (class Eq, class Monad, class Show, Unit, pure, unit)
-import Node.FS (FS)
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Exception (EXCEPTION)
-import Data.Tuple (Tuple)
+import Prelude (class Eq, class Monad, class Show, Unit)
 
 type FilePath = String
 data FileType = File | Directory

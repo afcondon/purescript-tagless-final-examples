@@ -8,7 +8,7 @@ import DummyData (sampleFakeFS)
 import FakeFileSystem (run)
 import Node.FS (FS) as N
 import NodeFileSystem (fsRun, fsState)
-import Prelude (Unit, bind, show, ($), (<>))
+import Prelude (Unit, bind, show, ($), (<>), discard)
 
 joinFiles :: ∀ m. (MonadFileSystem m) => m String
 joinFiles = do
