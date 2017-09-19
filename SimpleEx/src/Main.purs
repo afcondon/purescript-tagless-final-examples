@@ -1,6 +1,6 @@
 module Main where
 
-import Prelude (Unit, bind, map)
+import Prelude (Unit, bind, map, discard)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log, logShow)
 import Data.Array ((:))
