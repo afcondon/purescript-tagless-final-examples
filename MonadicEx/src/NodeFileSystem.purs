@@ -1,14 +1,13 @@
 module NodeFileSystem where
 
-import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, liftA1, pure, show, unit, ($))
 import AbstractFileSystem (class MonadFileSystem)
-import Effect (Effect) 
-import Effect.Class (class MonadEffect)
-import Effect.Unsafe (unsafePerformEffect)
 import Control.Monad.State.Class (class MonadState)
 import Control.Monad.State.Trans (StateT, runStateT)
 import Data.Tuple (Tuple, fst, snd)
+import Effect (Effect)
+import Effect.Class (class MonadEffect, liftEffect)
 import Node.FS.Sync (readdir)
+import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, liftA1, pure, show, unit, ($))
 
 newtype FSEff a = FSEff (StateT String Effect a)
 
@@ -16,8 +15,8 @@ instance monadFileSystemFSEff :: MonadFileSystem FSEff where
   cd "."  = pure unit
   cd ".." = pure unit
   cd _    = pure unit
-  ls = pure $ unsafePerformEffect $ readdir "." -- don't want to do this unsafePerformEff here. do i have to?
-  cat fs = pure $ show fs
+  ls      = liftEffect $ readdir "."
+  cat fs  = pure $ show fs
 
 derive newtype instance functorFSEff     :: Functor           FSEff
 derive newtype instance applyFSEff       :: Apply             FSEff
