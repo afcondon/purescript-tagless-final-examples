@@ -1,6 +1,6 @@
 module Simple where
 
-import Prelude (id, negate, show, (+), (<>))
+import Prelude (identity, negate, show, (+), (<>))
 
 class ExpSYM repr where
     lit :: Int -> repr
@@ -14,7 +14,7 @@ instance expsymInt :: ExpSYM Int where
     add e1 e2 = e1 + e2
 
 eval :: Int -> Int
-eval = id               -- amazingly the evaluator is just the Identity operation...
+eval = identity               -- amazingly the evaluator is just the Identity operation...
 
 -- Now we can write a different interpreter
 instance expsymString :: ExpSYM String where
@@ -23,4 +23,4 @@ instance expsymString :: ExpSYM String where
     add e1 e2 = "(" <> e1 <> " + " <> e2 <> ")"
 
 view :: String -> String
-view = id              -- ...and so is the viewer!
+view = identity              -- ...and so is the viewer!

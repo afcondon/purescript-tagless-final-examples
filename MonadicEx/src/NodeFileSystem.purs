@@ -2,39 +2,39 @@ module NodeFileSystem where
 
 import Prelude
 import AbstractFileSystem (class MonadFileSystem)
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Class (class MonadEff)
-import Control.Monad.Eff.Unsafe (unsafePerformEff)
-import Control.Monad.State (class MonadState)
+import Effect 
+import Effect.Class
+import Effect.Unsafe
+import Control.Monad.State.Class (class MonadState)
 import Control.Monad.State.Trans (StateT, runStateT)
 import Data.Tuple (Tuple, fst, snd)
 import Node.FS.Sync (readdir)
 
-newtype FSEff eff a = FSEff (StateT String (Eff eff) a)
+newtype FSEff a = FSEff (StateT String a)
 
-instance monadFileSystemFSEff :: MonadFileSystem (FSEff eff) where
+instance monadFileSystemFSEff :: MonadFileSystem FSEff where
   cd "."  = pure unit
   cd ".." = pure unit
   cd _    = pure unit
-  ls = pure $ unsafePerformEff $ readdir "." -- don't want to do this unsafePerformEff here. do i have to?
+  ls = pure $ unsafePerformEffect $ readdir "." -- don't want to do this unsafePerformEff here. do i have to?
   cat fs = pure $ show fs
 
-derive newtype instance functorFSEff     :: Functor           (FSEff eff)
-derive newtype instance applyFSEff       :: Apply             (FSEff eff)
-derive newtype instance applicativeFSEff :: Applicative       (FSEff eff)
-derive newtype instance bindFSEff        :: Bind              (FSEff eff)
-derive newtype instance monadFSEff       :: Monad             (FSEff eff)
-derive newtype instance monadEffFSEff    :: MonadEff   eff    (FSEff eff)
-derive newtype instance monadStateFSEff  :: MonadState String (FSEff eff)
+derive newtype instance functorFSEff     :: Functor           FSEff
+derive newtype instance applyFSEff       :: Apply             FSEff
+derive newtype instance applicativeFSEff :: Applicative       FSEff
+derive newtype instance bindFSEff        :: Bind              FSEff
+derive newtype instance monadFSEff       :: Monad             FSEff
+derive newtype instance monadEffFSEff    :: MonadEffect       FSEff
+derive newtype instance monadStateFSEff  :: MonadState String FSEff
 
--- runFSEff :: forall eff a. FSEff eff a -> Eff eff a
-runFSEff :: ∀ eff a. FSEff eff a -> String -> Eff eff (Tuple a String)
+-- runFSEff :: forall a. FSEff a -> Effect a
+runFSEff :: ∀ a. FSEff a -> String -> Effect (Tuple a String)
 runFSEff (FSEff fse) = runStateT fse
 
-fsState :: ∀ a eff. FSEff eff a -> Eff eff String
+fsState :: ∀ a. FSEff a -> Effect String
 fsState (FSEff fse) = liftA1 snd $ runStateT fse "initial state"
 
-fsRun :: ∀ a eff. FSEff eff a -> Eff eff a
+fsRun :: ∀ a. FSEff a -> Effect a
 fsRun (FSEff fse) = liftA1 fst $ runStateT fse "initial state"
 
 -- runFSEff'' :: ∀ eff. FSEff eff String -> FSEff eff Int
