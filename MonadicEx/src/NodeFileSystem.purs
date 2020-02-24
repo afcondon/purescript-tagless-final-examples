@@ -1,16 +1,16 @@
 module NodeFileSystem where
 
-import Prelude
+import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, liftA1, pure, show, unit, ($))
 import AbstractFileSystem (class MonadFileSystem)
-import Effect 
-import Effect.Class
-import Effect.Unsafe
+import Effect (Effect) 
+import Effect.Class (class MonadEffect)
+import Effect.Unsafe (unsafePerformEffect)
 import Control.Monad.State.Class (class MonadState)
 import Control.Monad.State.Trans (StateT, runStateT)
 import Data.Tuple (Tuple, fst, snd)
 import Node.FS.Sync (readdir)
 
-newtype FSEff a = FSEff (StateT String a)
+newtype FSEff a = FSEff (StateT String Effect a)
 
 instance monadFileSystemFSEff :: MonadFileSystem FSEff where
   cd "."  = pure unit

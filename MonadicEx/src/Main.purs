@@ -1,10 +1,11 @@
 module Main where
 
-import AbstractFileSystem (class MonadFileSystem, FilePath, cat, cd, ls)
 import Effect
+
+import AbstractFileSystem (class MonadFileSystem, FilePath, cat, cd, ls)
 import DummyData (sampleFakeFS)
+import Effect.Class.Console (log)
 import FakeFileSystem (run)
-import Node.FS (FS) as N
 import NodeFileSystem (fsRun, fsState)
 import Prelude (Unit, bind, show, ($), (<>), discard)
 
