@@ -9,7 +9,8 @@ import Data.Tuple (Tuple(..), fst, snd, lookup)
 import Data.Unit (Unit)
 import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, class Show, ap, pure, show, unit, ($), (<$>), (<<<), (<>))
 
-data FS = FS { files :: Array (Tuple FilePath String), directories :: Array (Tuple FilePath FS) }
+data FS = FS { files :: Array (Tuple FilePath String)
+             , directories :: Array (Tuple FilePath FS) }
 
 -- mimic the Haskell record accessors and refactor out later
 getFiles :: FS -> Array (Tuple FilePath String)
